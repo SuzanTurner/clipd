@@ -35,7 +35,7 @@ def format_logs_pretty(lines):
             formatted_lines.append(pretty)
         except json.JSONDecodeError:
             formatted_lines.append("Corrupted log line!")
-    return formatted_lines
+    return formatted_lines[::-1]
 
 def get_log(n: int = 10):
     if not HISTORY_PATH.exists():

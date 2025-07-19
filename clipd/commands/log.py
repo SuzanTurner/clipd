@@ -36,10 +36,13 @@ def show_logs(
             typer.echo(json.dumps(logs, indent=2))
         else:
             logs = get_log(lines)
-            for line in logs:
-                typer.echo(line.strip())
+            if logs:
+                for line in logs:
+                    typer.echo(line.strip())
+            else:
+                print("Clean Slate")
 
-        log_command(f"Viewed last {lines} log entries", msg=msg)
+        log_command(command= "log", detail= f"Veiwed logs", status= "Completed", msg = msg) 
 
 # @app.callback()
 # def show_logs_json(
@@ -73,5 +76,8 @@ def show_logs(
 
 @app.command("clear")
 def clear_logs(msg: str = typer.Option("", "--msg", help="Optional log message")):
-    clear_history()
-    log_command(f"History cleared", msg = msg)
+    try:
+        clear_history()
+        log_command(command= "log clear", detail= f"Cleared logs", status= "Completed", msg = msg) 
+    except Exception as e:
+        log_command(command= "log clear", detail= f"Unable to clear logs due to {e}", status= "Failed", msg = msg)

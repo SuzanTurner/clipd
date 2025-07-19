@@ -20,10 +20,10 @@ class Base:
         try:
             df = pd.read_csv(file)
             typer.echo(f"Loaded {len(df)} rows.")
-            log_command(f"Connected to {file}", msg= msg)
+            log_command(command= "connect", detail= f"Connected to {file}", status= "Completed", msg = msg) 
         except Exception as e:
             typer.echo(f"Error: {e}")
-            log_command(f"Failed to connect {file}", msg = msg)
+            log_command(command= "connect", detail= f"Unable to connect {file}", status= "Failed", msg = msg) 
 
     @staticmethod
     def describe(msg: str = typer.Option("", "--msg", help="Optional log message")):
@@ -31,13 +31,13 @@ class Base:
             file = load_session()  
             df = pd.read_csv(file)
             typer.echo(df.describe().to_string())
-            log_command(f"Described {file}", msg = msg)
+            log_command(command= "describe", detail= f"Described {file}", status= "Completed", msg = msg) 
         except FileNotFoundError as e:
             typer.echo(f"Error: {e}")
-            log_command(f"Failed to describe {file} due to {e}", msg = msg)
+            log_command(command= "describe", detail= f"Unable to describe {file} due to {e}", status= "Failed", msg = msg) 
         except Exception as e:
             typer.echo(f"Error: {e}")
-            log_command(f"Failed to describe {file} due to {e}", msg = msg)
+            log_command(command= "describe", detail= f"Unable to describe {file} due to {e}", status= "Failed", msg = msg) 
 
     @staticmethod
     def show_connected_file(msg: str = typer.Option("", "--msg", help="Optional log message")):
