@@ -1,9 +1,9 @@
 from pathlib import Path
 from datetime import datetime
-import typer
+# import typer
 import json
 
-app = typer.Typer(help = "Veiwing history")
+# app = typer.Typer(help = "Veiwing history")
 
 HISTORY_PATH = Path.home() / ".clipd_history.txt"
 
@@ -65,7 +65,7 @@ def num_log():
 def clear_history():
     if HISTORY_PATH.exists():
         HISTORY_PATH.unlink()
-        print("History cleared.")
+        # print("History cleared.")
     else:
         print("No history to clear.")
     
