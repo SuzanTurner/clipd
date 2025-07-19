@@ -45,6 +45,15 @@ def get_log(n: int = 10):
         formatted = format_logs_pretty(lines)
         for line in formatted:
             print(line)
+
+def num_log():
+    if not HISTORY_PATH.exists():
+        return 0  
+
+    with open(HISTORY_PATH) as f:
+        lines = f.readlines()
+        return len(lines)
+        
     
 def clear_history():
     if HISTORY_PATH.exists():
