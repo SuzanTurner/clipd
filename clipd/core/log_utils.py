@@ -19,12 +19,32 @@ def log_command(command: str, detail : str, status: str , msg: str = ""):
     with open(HISTORY_PATH, "a") as f:
         f.write(json.dumps(entry) + "\n")
 
+def format_logs_pretty(lines):
+    formatted_lines = []
+    for line in lines:
+        try:
+            entry = json.loads(line)
+            timestamp = entry.get("timestamp", "")
+            command = entry.get("command", "")
+            status = entry.get("status", "")
+            msg = entry.get("msg", "")
+
+            pretty = f"[{timestamp}] {command} - {status}"
+            if msg:
+                pretty += f" | {msg}"
+            formatted_lines.append(pretty)
+        except json.JSONDecodeError:
+            formatted_lines.append("Corrupted log line!")
+    return formatted_lines
+
 def get_log(n: int = 10):
     if not HISTORY_PATH.exists():
         return []
     with open(HISTORY_PATH) as f:
-        lines = f.readlines()
-        return lines[-n:]
+        lines = f.readlines()[-n:]
+        formatted = format_logs_pretty(lines)
+        for line in formatted:
+            print(line)
     
 def clear_history():
     if HISTORY_PATH.exists():
