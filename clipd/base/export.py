@@ -40,7 +40,7 @@ class Export:
             --preview (bool): Show the export path and format without actually writing the file.
 
         Example:
-            clipd export --json --filename my_data --dir ./exports --msg "Backup export"
+            $ clipd export --json --filename my_data --dir ./exports --msg "Backup export"
 
         Returns:
             None

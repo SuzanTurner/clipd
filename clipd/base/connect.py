@@ -28,7 +28,7 @@ class Connect:
         """
 
         msg = msg.strip()
-        command_str = "connect" + (" --msg" if msg else "")
+        command_str = "connect " + file + (" --msg" if msg else "")
 
         if not Path(file).exists():
             typer.secho(f"File not found: {file}", fg=typer.colors.RED, bold=True)
@@ -38,7 +38,7 @@ class Connect:
         print(f"[bold yellow]Connecting to {file}...[/bold yellow]")
         save_session(Path(file).resolve())
         try:
-            df = pd.read_csv(file)
+            df = pd.read_csv(file, on_bad_lines="error", engine="python")
             typer.secho(f"Loaded {len(df)} rows.", fg=typer.colors.GREEN)
             log_command(command=command_str, detail=f"Connected to {file}", status="Completed", msg=msg)
             return df

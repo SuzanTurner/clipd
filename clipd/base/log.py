@@ -4,6 +4,8 @@ import json
 
 log_app = typer.Typer(help="Display and manage logs", invoke_without_command=True)  
 
+# TODO : Format Logs!! (" --msg" if msg else "")
+
 @log_app.callback()
 def show_logs(
     ctx: typer.Context,
@@ -26,7 +28,7 @@ def show_logs(
             log_command(command="log", detail="Viewed logs", status="Completed", msg=msg)
     except Exception as e:
         log_command(command="log", detail=f"Could not view logs due to {e}", status="Failed", msg=msg)
-        
+
 
 @log_app.command("clear", help="Clears all logs from the current session")
 def clear_logs(msg: str = typer.Option("", "--msg", help="Optional log message")):

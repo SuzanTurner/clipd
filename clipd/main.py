@@ -5,8 +5,7 @@ import typer
 app = typer.Typer(cls=SuggestGroup,  help="Command Line Interface for Pandas")
 
 
-app.add_typer(base.get_base_app())
-
+app.add_typer(base.base())
 
 def main():
     app()

@@ -45,9 +45,10 @@ def active_file():
 
     return path
 
-# def disconnect_session():
-#     if SESSION_PATH.exists():
-#         SESSION_PATH.unlink()
-#         print("[bold green]Session disconnected. All ties severed.[/bold green]")
-#     else:
-#         print("[yellow]No active session found to disconnect.[/yellow]")
+def disconnect_session():
+    if SESSION_PATH.exists():
+        file_name = SESSION_PATH.read_text().strip()
+        SESSION_PATH.unlink()
+        return file_name
+    else:
+        return None

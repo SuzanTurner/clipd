@@ -1,10 +1,7 @@
-
 from typer.testing import CliRunner
-from clipd.base.base import Base
-import typer
+from clipd.base import base 
+import pytest
 
-cli = typer.Typer()
-cli.command()(Base.init)
 runner = CliRunner()
 
 def test_init(monkeypatch):
@@ -16,16 +13,20 @@ def test_init(monkeypatch):
         logs["status"] = status
         logs["msg"] = msg
 
-    monkeypatch.setattr("clipd.base.base.log_command", mock_log_command)
+    monkeypatch.setattr("clipd.base.init.log_command", mock_log_command)
 
-    result = runner.invoke(cli, ["--msg", "pytest was here"])
+    app = base.base()  
 
-    assert "Clipd Initialised!" in result.stdout
+    result = runner.invoke(app, ["init", "--msg", "pytest was here"])
+
+    print("STDOUT:", result.stdout)
+    print("STDERR:", result.stderr)
+
     assert result.exit_code == 0
+    assert "Clipd Initialised!" in result.stdout
     assert logs == {
-        "command": "init",
+        "command": "init --msg",
         "detail": "Clipd Initialised",
         "status": "Completed",
         "msg": "pytest was here"
     }
-
