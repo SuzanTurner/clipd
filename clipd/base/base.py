@@ -49,3 +49,7 @@ class Base:
         except FileNotFoundError as e:
             typer.echo("No file connected.")
             log_command(command= "status", detail= f"Failed to connect due to {e}", status= "Failed", msg = msg)
+
+    @staticmethod
+    def thank_you():
+        print("Thank you [bold yellow]@tiangolo[/bold yellow], creator of [bold blue]Typer[/bold blue] and [bold green]FastAPI[/bold green]")
