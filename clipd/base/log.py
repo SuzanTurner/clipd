@@ -2,37 +2,33 @@ import typer
 from clipd.core.log_utils import clear_history, get_log, log_command, get_json_logs, num_log
 import json
 
-app = typer.Typer(help = "Clearing Logs", invoke_without_command=True)
+log_app = typer.Typer(help="Display and manage logs", invoke_without_command=True)  
 
-
-@app.callback()
+@log_app.callback()
 def show_logs(
     ctx: typer.Context,
     lines: int = 10,
     msg: str = typer.Option("", "--msg", help="Optional log message"),
     json_flag: bool = typer.Option(False, "--json", help="Show raw JSON logs"),
-    all : bool = typer.Option(False, "--all", help = "Show all logs")
+    all: bool = typer.Option(False, "--all", help="Show all logs")
 ):
     try:
         if ctx.invoked_subcommand is None:
+            logs = get_json_logs(lines) if json_flag else get_log(float('inf') if all else lines)
             if json_flag:
-                logs = get_json_logs(lines)
                 typer.echo(json.dumps(logs[::-1], indent=2))
+            elif logs:
+                for line in logs:
+                    typer.echo(line.strip())
             else:
-                # logs = get_log(lines)
-                logs = get_log(float('inf') if all else lines)
-                if logs:
-                    for line in logs:
-                        typer.echo(line.strip())
-                else:
-                    print("Clean Slate")
+                print("Clean Slate")
 
-            log_command(command= "log", detail= f"Veiwed logs", status= "Completed", msg = msg) 
+            log_command(command="log", detail="Viewed logs", status="Completed", msg=msg)
     except Exception as e:
-        log_command(command= "log", detail= f"Could not veiw logs due to {e}", status= "Failed", msg = msg) 
+        log_command(command="log", detail=f"Could not view logs due to {e}", status="Failed", msg=msg)
+        
 
-
-@app.command("clear")
+@log_app.command("clear", help="Clears all logs from the current session")
 def clear_logs(msg: str = typer.Option("", "--msg", help="Optional log message")):
     try:
         log_count = num_log()

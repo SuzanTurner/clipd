@@ -22,7 +22,7 @@ class Export:
         json: bool = typer.Option(False, "--json", help="Export in JSON format"),
         xlsx: bool = typer.Option(False, "--xlsx", help="Export in Excel (.xlsx) format"),
         msg: str = typer.Option("", "--msg", help="Optional log message"),
-        filename: str = typer.Option("exported_data", "--filename", "-f", help="Custom filename (without extension)"),
+        filename: str = typer.Option("exported_from_clipd", "--filename", "-f", help="Custom filename (without extension)"),
         dir: str = typer.Option(".", "--dir", help="Directory to export the file to"),
         force: bool = typer.Option(False, "--force", "-F", help="Overwrite file if it exists"),
         preview: bool = typer.Option(False, "--preview", help="Show the full export path and format without writing file"),
