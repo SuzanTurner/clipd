@@ -10,7 +10,7 @@ def save_session(file_path: str):
 
 def load_session():
     if not SESSION_PATH.exists():
-        raise FileNotFoundError("No session found. Run `clipd connect <file>` first.")
+        raise FileNotFoundError("No session found. \nRun `clipd connect <file>` first.")
     with open(SESSION_PATH) as f:
         return json.load(f)["file"]
     

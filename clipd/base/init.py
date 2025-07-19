@@ -1,5 +1,7 @@
 
 from clipd.core.log_utils import log_command
+from clipd.core.session import SESSION_PATH
+from rich import print
 import typer
 
 class Init:
@@ -25,13 +27,23 @@ class Init:
         msg = msg.strip()
         command_str = "init" + (" --msg" if msg else "")
         try:
-            typer.secho("Clipd Initialised!", fg=typer.colors.GREEN, bold=True)
-            log_command(
-                command=command_str,
-                detail="Clipd Initialised",
-                status="Completed",
-                msg=msg
-            )
+            if not SESSION_PATH.exists():
+                typer.secho("Clipd Initialised!", fg=typer.colors.GREEN, bold=True)
+                log_command(
+                    command=command_str,
+                    detail="Clipd Initialised",
+                    status="Completed",
+                    msg=msg
+                )
+            else:
+                typer.secho("Clipd Reinitialised!", fg=typer.colors.GREEN, bold=True)
+                print(f"[dim]Connected to session {SESSION_PATH}[/dim]")
+                log_command(
+                    command=command_str,
+                    detail="Clipd Initialised",
+                    status="Completed",
+                    msg=msg
+                )
         except Exception as e:
             log_command(
                 command=command_str,
