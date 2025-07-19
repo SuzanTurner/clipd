@@ -40,11 +40,18 @@ def format_logs_pretty(lines):
 def get_log(n: int = 10):
     if not HISTORY_PATH.exists():
         return []
+    
     with open(HISTORY_PATH) as f:
-        lines = f.readlines()[-n:]
-        formatted = format_logs_pretty(lines)
-        for line in formatted:
-            print(line)
+        lines = f.readlines()
+    
+    if n == float('inf'):
+        selected_lines = lines
+    else:
+        selected_lines = lines[-n:]
+    
+    formatted = format_logs_pretty(selected_lines)
+    return formatted
+
 
 def num_log():
     if not HISTORY_PATH.exists():

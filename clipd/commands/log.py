@@ -11,6 +11,7 @@ def show_logs(
     lines: int = 10,
     msg: str = typer.Option("", "--msg", help="Optional log message"),
     json_flag: bool = typer.Option(False, "--json", help="Show raw JSON logs"),
+    all : bool = typer.Option(False, "--all", help = "Show all logs")
 ):
     try:
         if ctx.invoked_subcommand is None:
@@ -18,7 +19,8 @@ def show_logs(
                 logs = get_json_logs(lines)
                 typer.echo(json.dumps(logs[::-1], indent=2))
             else:
-                logs = get_log(lines)
+                # logs = get_log(lines)
+                logs = get_log(float('inf') if all else lines)
                 if logs:
                     for line in logs:
                         typer.echo(line.strip())

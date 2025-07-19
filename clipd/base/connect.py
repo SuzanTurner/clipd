@@ -36,8 +36,7 @@ class Connect:
             raise typer.Exit(code=1)
 
         print(f"[bold yellow]Connecting to {file}...[/bold yellow]")
-        save_session(file)
-        
+        save_session(Path(file).resolve())
         try:
             df = pd.read_csv(file)
             typer.secho(f"Loaded {len(df)} rows.", fg=typer.colors.GREEN)

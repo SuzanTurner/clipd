@@ -2,6 +2,7 @@ from clipd.base.init import Init
 from clipd.base.connect import Connect
 from clipd.base.describe import Describe
 from clipd.base.thankyou import Thankyou
+from clipd.base.export import Export
 import typer
 
 def get_base_app():
@@ -10,6 +11,7 @@ def get_base_app():
     app.command("init", help = "Initialising Clipd")(Init.init)
     app.command("connect", help = "Connects to excel/csv file")(Connect.connect)
     app.command("describe", help = "Pandas describe function")(Describe.describe)
+    app.command("export", help = "Export the modified DataFrame to the current directory in csv. Optional flags: --json, --excel,--msg")(Export.export)
     app.command("thankyou", help = "Gratitude message")(Thankyou.thank_you)
 
     return app
