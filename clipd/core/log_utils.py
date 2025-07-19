@@ -29,7 +29,7 @@ def format_logs_pretty(lines):
             status = entry.get("status", "")
             msg = entry.get("msg", "")
 
-            pretty = f"[{timestamp}] {command} - {status}"
+            pretty = f"[{timestamp}] {command} | {status}"
             if msg:
                 pretty += f" | {msg}"
             formatted_lines.append(pretty)
