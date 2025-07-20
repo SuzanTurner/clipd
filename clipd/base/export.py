@@ -8,13 +8,17 @@ from pathlib import Path
 from datetime import datetime
 
 
-def write_file(df, file_path, export_format):
-    if export_format == "csv":
-        df.to_csv(file_path, index=False)
-    elif export_format == "json":
-        df.to_json(file_path, orient="records", indent=2)
-    elif export_format == "xlsx":
-        df.to_excel(file_path, index=False)
+def write_file(df, path: Path, format: str):
+    if format == "csv":
+        df.to_csv(path, index=False)
+    elif format == "json":
+        df.to_json(path, orient="records", indent=2)
+    elif format == "xlsx":
+        df.to_excel(path, index=False)
+    else:
+        raise ValueError(f"Unsupported format: {format}")
+
+
 
 class Export:
     @staticmethod
@@ -27,24 +31,6 @@ class Export:
         force: bool = typer.Option(False, "--force", "-F", help="Overwrite file if it exists"),
         preview: bool = typer.Option(False, "--preview", help="Show the full export path and format without writing file"),
     ):
-        """
-        Export the current DataFrame to the specified format and directory.
-
-        Args:
-            --json (bool): Export as JSON. Default is CSV.
-            --xlsx (bool): Export as Excel (.xlsx). Default is CSV.
-            --msg (str): Optional log message to include in the terminal output.
-            --filename (str): Name of the exported file (without extension). Default is 'exported_data'.
-            --dir (str): Directory where the file should be saved. Default is the current directory.
-            --force (bool): Overwrite file if it already exists. Default is False.
-            --preview (bool): Show the export path and format without actually writing the file.
-
-        Example:
-            $ clipd export --json --filename my_data --dir ./exports --msg "Backup export"
-
-        Returns:
-            None
-        """
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         msg = msg.strip()
         command_str = "export" + (" --msg" if msg else "") + (" --json" if json else "") + (" --xlsx" if xlsx else "") + (" --filename" if filename else "") + (" --dir" if dir else "") + (" --force" if force else "") + (" --preview" if preview else "")
@@ -53,57 +39,53 @@ class Export:
         df = pd.read_csv(file_path)
 
         if df.empty:
-            print("[bold red]No data to export.[/bold red] Please connect a file or process a DataFrame first.")
-            log_command(
-                command=command_str,
-                detail=f"No data",
-                status="Failed",
-                msg=msg
-            )
+            typer.secho("[bold red]No data to export.[/bold red] Please connect a file or process a DataFrame first.")
+            log_command(command=command_str, detail="No data", status="Failed", msg=msg)
             raise typer.Exit(code=1)
-        
+
+        # Determine export format
         export_format = "csv"
         if json:
             export_format = "json"
         elif xlsx:
             export_format = "xlsx"
 
+        # Build export path
         export_path = Path(dir).resolve() / f"{filename}.{export_format}"
         export_path.parent.mkdir(parents=True, exist_ok=True)
 
-        write_file(df, export_path, export_format)
-        
-
+        # Preview-only mode
         if preview:
-            typer.secho(f"Would export as {export_format.upper()} to → {file_path}", fg=typer.colors.YELLOW)
+            typer.secho(f"Would export as {export_format.upper()} to → {export_path}", fg=typer.colors.YELLOW)
             log_command(
                 command=command_str,
-                detail=f"Would export as {export_format.upper()} to → {file_path}",
+                detail=f"Preview export as {export_format.upper()} to → {export_path}",
                 status="Completed",
                 msg=msg
             )
             raise typer.Exit()
 
-        if file_path.exists() and not force:
-            typer.secho(f"File already exists at {file_path}. Use --force to overwrite.", fg=typer.colors.RED)
+        # File exists check
+        if export_path.exists() and not force:
+            typer.secho(f"File already exists at {export_path}. Use --force to overwrite.", fg=typer.colors.RED)
             log_command(
                 command=command_str,
-                detail=f"File already exists at {file_path}. Use --force to overwrite.",
+                detail=f"File already exists at {export_path}. Use --force to overwrite.",
                 status="Failed",
                 msg=msg
             )
             raise typer.Exit(code=1)
 
+        # Export file
         try:
-            write_file(df, file_path, export_format)
-            typer.secho(f"{timestamp} | Exported as {export_format.upper()} → {file_path}", fg=typer.colors.YELLOW)
+            write_file(df, export_path, export_format)
+            typer.secho(f"{timestamp} | Exported as {export_format.upper()} → {export_path}", fg=typer.colors.GREEN)
             log_command(
                 command=command_str,
-                detail=f"Would export as {export_format.upper()} to → {file_path}",
+                detail=f"Exported as {export_format.upper()} → {export_path}",
                 status="Completed",
                 msg=msg
             )
-
         except Exception as e:
             typer.secho(f"Export failed: {e}", fg=typer.colors.RED)
             log_command(
@@ -112,5 +94,4 @@ class Export:
                 status="Failed",
                 msg=msg
             )
-
             raise typer.Exit(code=1)

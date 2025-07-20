@@ -1,6 +1,7 @@
 import pandas as pd
 from clipd.core.session import save_session
 from clipd.core.log_utils import log_command
+from clipd.core.load import load
 from rich import print
 from pathlib import Path
 import typer 
@@ -34,7 +35,13 @@ class Connect:
             typer.secho(f"File not found: {file}", fg=typer.colors.RED, bold=True)
             log_command(command=command_str, detail=f"File not found: {file}", status="Failed", msg=msg)
             raise typer.Exit(code=1)
-
+        
+        try:
+            df = load(Path(file))  
+        except Exception as e:
+            typer.secho(f"Failed to load file: {e}", fg=typer.colors.RED)
+            raise typer.Exit(code=1)
+        
         print(f"[bold yellow]Connecting to {file}...[/bold yellow]")
         save_session(Path(file).resolve())
         try:
@@ -44,11 +51,11 @@ class Connect:
             return df
         except pd.errors.EmptyDataError:
             typer.secho("The file is empty.", fg=typer.colors.RED)
-            log_command(command=command_str, detail="CSV file is empty ", status="Failed", msg=msg)
+            log_command(command=command_str, detail="File is empty ", status="Failed", msg=msg)
             raise typer.Exit(code=1)
         except pd.errors.ParserError as e:
             typer.secho(f"Malformed CSV: {e}", fg=typer.colors.RED)
-            log_command(command=command_str, detail=f"Malformed CSV: {e}", status="Failed", msg=msg)
+            log_command(command=command_str, detail=f"Malformed file: {e}", status="Failed", msg=msg)
             raise typer.Exit(code=1)
         except Exception as e:
             typer.secho(f"Error reading file: {e}", fg=typer.colors.RED)
