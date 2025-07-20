@@ -27,7 +27,7 @@ class Export:
         xlsx: bool = typer.Option(False, "--xlsx", help="Export in Excel (.xlsx) format"),
         msg: str = typer.Option("", "--msg", help="Optional log message"),
         filename: str = typer.Option("exported_from_clipd", "--filename", "-f", help="Custom filename (without extension)"),
-        dir: str = typer.Option(".", "--dir", help="Directory to export the file to"),
+        dir: str = typer.Option("clipd_outputs", "--dir", help="Directory to export the file to"),
         force: bool = typer.Option(False, "--force", "-F", help="Overwrite file if it exists"),
         preview: bool = typer.Option(False, "--preview", help="Show the full export path and format without writing file"),
     ):
@@ -35,11 +35,16 @@ class Export:
         msg = msg.strip()
         command_str = "export" + (" --msg" if msg else "") + (" --json" if json else "") + (" --xlsx" if xlsx else "") + (" --filename" if filename else "") + (" --dir" if dir else "") + (" --force" if force else "") + (" --preview" if preview else "")
 
-        file_path = active_file()
-        df = pd.read_csv(file_path)
+        try:
+            file_path = active_file()
+            df = pd.read_csv(file_path)
+        except FileNotFoundError:
+            print("[bold red]No file found \nRun clipd connect <file> [/bold red] ")
+            raise typer.Exit(code = 1)
+        
 
         if df.empty:
-            typer.secho("[bold red]No data to export.[/bold red] Please connect a file or process a DataFrame first.")
+            print("[bold red]No data to export.[/bold red]")
             log_command(command=command_str, detail="No data", status="Failed", msg=msg)
             raise typer.Exit(code=1)
 
