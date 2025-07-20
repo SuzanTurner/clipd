@@ -5,6 +5,7 @@ from rich.panel import Panel
 from rich.text import Text
 from rich.progress import track
 from typer import Typer
+import typer
 
 
 class Thankyou():  
@@ -26,33 +27,23 @@ class Thankyou():
 
 class Why():
     @staticmethod
-    def why():
-        print("[bold cyan]📜 The Origin of Clipd[/bold cyan]\n")
+    def why(long : bool = typer.Option(False, "--long", help = "Long Story not short")):
+        if long:
+            print("[bold cyan]📜 The Origin of Clipd[/bold cyan]\n")
+            print("I was this backend guy at this **** company that paid me lesser than my self-confidance")
+            print("Wrangling CSVs and APIs and DBs ")
 
-        print("[italic dim]Once upon a deployment...[/italic dim]")
-        print("I was the ETL guy. You know the one — duct-taping pipelines at 2 AM,")
-        print("wrangling CSVs that looked like they'd survived a war,")
-        print("living between [bold]pandas[/bold], [bold]Jupyter notebooks[/bold], and [bold]frustration[/bold].\n")
+            print("The data cleaning felt like torture")
+            print("[yellow]All I wanted was something faster. Slicker. Cleaner. Lighter.[/yellow]")
+            print("[green]Something that saved my time[/green]\n")
 
-        print("Every task felt like déjà vu.")
-        print("Same cleanup, same transform, same exports... different bugs.")
-        print("[yellow]All I wanted was something faster. Slicker. Cleaner. Lighter.[/yellow]\n")
-
-        print("But all I got was more boilerplate, more notebooks, more 😮‍💨 copy-paste.")
-        print("So one day, I snapped. Not in a villain arc way, more like a [italic]main-character moment[/italic].\n")
-
-        print("[bold green]And I wrote Clipd.[/bold green]")
-        print("Not a framework. Not a library. A [bold magenta]vibe[/bold magenta].")
-        print("A CLI-first, ETL-tuned, zero-bullshit tool that respects your time.")
-        print("Built with [bold]Typer[/bold], styled with [bold]Rich[/bold], and [bold]Pandas[/bold] ofcourse [dim](Don't bother about the hipocrasy) [/dim], powered by every moment I said,")
-        print("[italic]'There has to be a better way.'[/italic]\n")
+            print("[italic]So one afternoon... I put my brains to work[/italic]")
+            print("[italic dim]And here we are...[/italic dim]")
         
-
-        print("[blue]Clipd is for the misfits who automate their pain,[/blue]")
-        print("[blue]the rebels who don’t want to live inside Jupyter forever,[/blue]")
-        print("[blue]and the builders who think CLI should be a love letter — not a chore.[/blue]\n")
-
-        print("[bold yellow]Welcome to Clipd! [/bold yellow]")
+            print("[bold yellow]Welcome to Clipd! [/bold yellow]")
+        else:
+            print("[bold yellow]Long story short [/bold yellow]")
+            print("I was bored one afternoon")
 
 console = Console()
 selfdestruct_app = Typer()
@@ -64,7 +55,7 @@ class SelfDestruct():
     
         console.clear()
 
-        console.print(Panel.fit("[bold red]⚠️ INITIATING SELF-DESTRUCT SEQUENCE[/bold red]", border_style="bold red"))
+        console.print(Panel.fit("[bold red]⚠️INITIATING SELF-DESTRUCT SEQUENCE[/bold red]", border_style="bold red"))
 
         countdown = [5, 4, 3, 2, 1]
 
@@ -94,7 +85,7 @@ class SelfDestruct():
         console.clear()
         console.print(
             Panel.fit(
-                Text("Just kidding.", style="bold green"),
+                Text("clipd CHECKPOINT to the rescue", style="bold green"),
                 title="[bold red]Abort Mission[/bold red]",
                 subtitle="clipd eggs",
                 border_style="bold red"
