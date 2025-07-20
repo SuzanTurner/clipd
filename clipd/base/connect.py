@@ -38,15 +38,16 @@ class Connect:
         
         try:
             df = load(Path(file))  
-        except Exception as e:
-            typer.secho(f"Failed to load file: {e}", fg=typer.colors.RED)
+        except ValueError as e:
+            typer.secho(f"{e}", fg=typer.colors.RED, bold=True)
+            log_command(command=command_str, detail=str(e), status="Failed", msg=msg)
             raise typer.Exit(code=1)
         
         print(f"[bold yellow]Connecting to {file}...[/bold yellow]")
-        save_session(Path(file).resolve())
         try:
-            df = pd.read_csv(file, on_bad_lines="error", engine="python")
+            # df = pd.read_csv(file, on_bad_lines="error", engine="python")
             typer.secho(f"Loaded {len(df)} rows.", fg=typer.colors.GREEN)
+            save_session(Path(file).resolve())
             log_command(command=command_str, detail=f"Connected to {file}", status="Completed", msg=msg)
             return df
         except pd.errors.EmptyDataError:

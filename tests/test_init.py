@@ -23,7 +23,7 @@ def test_init(monkeypatch):
     print("STDERR:", result.stderr)
 
     assert result.exit_code == 0
-    assert "Clipd Initialised!" in result.stdout
+    assert "Clipd Reinitialised!\nConnected to session C:\\Users\\HP\\.clipd_session.json\n" in result.stdout
     assert logs == {
         "command": "init --msg",
         "detail": "Clipd Initialised",

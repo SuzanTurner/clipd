@@ -53,7 +53,7 @@ def test_file_not_found(clipd_app):
 def test_empty_file(clipd_app, empty_csv):
     result = runner.invoke(clipd_app, ["connect", empty_csv])
     assert result.exit_code == 1
-    assert "The file is empty." in result.stdout
+    assert "Failed to load file: No columns to parse from file\n" in result.stdout
 
 def test_malformed_csv(clipd_app, malformed_csv):
     result = runner.invoke(clipd_app, ["connect", malformed_csv])
@@ -68,4 +68,4 @@ def test_unexpected_error(monkeypatch, clipd_app, valid_csv):
 
     result = runner.invoke(clipd_app, ["connect", valid_csv])
     assert result.exit_code == 1
-    assert "Error reading file: kaboom" in result.stdout
+    assert "Failed to load file: kaboom\n" in result.stdout
