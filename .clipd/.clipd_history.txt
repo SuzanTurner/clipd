@@ -1,3 +1,0 @@
-{"timestamp": "2025-07-21 22:37:45", "command": "log", "detail": "Viewed logs", "status": "Completed", "msg": ""}
-{"timestamp": "2025-07-21 22:37:53", "command": "init", "detail": "Clipd Initialised", "status": "Completed", "msg": ""}
-{"timestamp": "2025-07-21 22:37:58", "command": "log", "detail": "Viewed logs", "status": "Completed", "msg": ""}
