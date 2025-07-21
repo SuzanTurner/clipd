@@ -1,11 +1,12 @@
 from pathlib import Path
 from datetime import datetime
+from clipd.core.session import CLIPD_DIR
 # import typer
 import json
 
 # app = typer.Typer(help = "Veiwing history")
 
-HISTORY_PATH = Path.home() / ".clipd_history.txt"
+HISTORY_PATH = CLIPD_DIR / ".clipd_history.txt"
 
 def log_command(command: str, detail : str, status: str , msg: str = ""):
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")

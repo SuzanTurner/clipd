@@ -1,11 +1,12 @@
 from rich import print
-import time
 from rich.console import Console
 from rich.panel import Panel
 from rich.text import Text
 from rich.progress import track
 from typer import Typer
 import typer
+import time
+
 
 
 class Thankyou():  

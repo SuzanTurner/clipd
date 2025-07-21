@@ -1,54 +1,113 @@
+# from pathlib import Path
+# import json
+
+# SESSION_PATH = Path.cwd() / ".clipd"
+
+# SESSION_PATH.mkdir(parents=True, exist_ok=True)
+
+# def save_session(file_path: str):
+#     with open(SESSION_PATH, "w") as f:
+#         # json.dump({"file": file_path}, f)
+#         json.dump({"file": str(file_path)}, f)
+
+# def load_session():
+#     if not SESSION_PATH.exists():
+#         raise FileNotFoundError("No session found. \nRun `clipd connect <file>` first.")
+#     with open(SESSION_PATH) as f:
+#         return json.load(f)["file"]
+    
+# # def rel_path():
+# #     with open(SESSION_PATH) as f:
+# #         raw_path = json.load(f)["file"]
+# #     path = Path(raw_path)
+
+# #     # If it's relative, make it absolute based on cwd
+# #     if not path.is_absolute():
+# #         path = Path.cwd() / path
+
+# #     if not path.exists():
+# #         raise FileNotFoundError(f"Session file not found at: {path}")
+
+# #     return path
+
+# def active_file():
+#     if not SESSION_PATH.exists():
+#         raise FileNotFoundError("No active file. \nRun `clipd connect <file>` first.")
+    
+#     with open(SESSION_PATH) as f:
+#         raw_path = json.load(f)["file"]
+    
+#     path = Path(raw_path)
+
+#     if not path.is_absolute():
+#         path = Path.cwd() / path
+
+#     if not path.exists():
+#         raise FileNotFoundError(f"File not found at: {path}")
+
+#     return path
+
+# def filename(path: str) -> str:
+#     p = Path(path)
+#     if not p.exists():
+#         raise FileNotFoundError(f"File does not exist: {path}")
+#     return p.name
+
+# def disconnect_session():
+#     if SESSION_PATH.exists():
+#         file_name = SESSION_PATH.read_text().strip()
+#         SESSION_PATH.unlink()
+#         return file_name
+#     else:
+#         return None
+
 from pathlib import Path
 import json
 
-SESSION_PATH = Path.home() / ".clipd_session.json"
+CLIPD_DIR = Path.cwd() / ".clipd"
+SESSION_PATH = CLIPD_DIR / "session.json"  # now points to a file, not dir
+
+CLIPD_DIR.mkdir(parents=True, exist_ok=True)
 
 def save_session(file_path: str):
     with open(SESSION_PATH, "w") as f:
-        # json.dump({"file": file_path}, f)
         json.dump({"file": str(file_path)}, f)
 
-def load_session():
+def load_session() -> str:
     if not SESSION_PATH.exists():
         raise FileNotFoundError("No session found. \nRun `clipd connect <file>` first.")
+    
     with open(SESSION_PATH) as f:
         return json.load(f)["file"]
-    
-def rel_path():
-    with open(SESSION_PATH) as f:
-        raw_path = json.load(f)["file"]
-    path = Path(raw_path)
 
-    # If it's relative, make it absolute based on cwd
-    if not path.is_absolute():
-        path = Path.cwd() / path
-
-    if not path.exists():
-        raise FileNotFoundError(f"Session file not found at: {path}")
-
-    return path
-
-def active_file():
+def active_file() -> Path:
     if not SESSION_PATH.exists():
-        raise FileNotFoundError("No session found. Run `clipd connect <file>` first.")
-    
+        raise FileNotFoundError("No active file. \nRun `clipd connect <file>` first.")
+
     with open(SESSION_PATH) as f:
         raw_path = json.load(f)["file"]
-    
+
     path = Path(raw_path)
 
+    # Convert to absolute if needed
     if not path.is_absolute():
         path = Path.cwd() / path
 
     if not path.exists():
-        raise FileNotFoundError(f"Session file not found at: {path}")
+        raise FileNotFoundError(f"File not found at: {path}")
 
     return path
+
+def filename(path: str) -> str:
+    p = Path(path)
+    if not p.exists():
+        raise FileNotFoundError(f"File does not exist: {path}")
+    return p.name
 
 def disconnect_session():
     if SESSION_PATH.exists():
-        file_name = SESSION_PATH.read_text().strip()
+        with open(SESSION_PATH) as f:
+            file_info = json.load(f).get("file", "")
         SESSION_PATH.unlink()
-        return file_name
-    else:
-        return None
+        return file_info
+    return None
