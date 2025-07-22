@@ -14,6 +14,8 @@ def show_logs(
     json_flag: bool = typer.Option(False, "--json", help="Show raw JSON logs"),
     all: bool = typer.Option(False, "--all", help="Show all logs")
 ):
+    msg = msg.strip()
+    command_str = "log " + ("--msg" if msg else "") + (f"--lines {lines}" if lines != 10 else "") + ("--json" if json_flag else "") + ("--all" if all else "")
     try:
         if ctx.invoked_subcommand is None:
             logs = get_json_logs(lines) if json_flag else get_log(float('inf') if all else lines)
@@ -25,26 +27,28 @@ def show_logs(
             else:
                 print("Clean Slate")
 
-            log_command(command="log", detail="Viewed logs", status="Completed", msg=msg)
+            log_command(command=command_str, detail="Viewed logs", status="Completed", msg=msg)
     except Exception as e:
-        log_command(command="log", detail=f"Could not view logs due to {e}", status="Failed", msg=msg)
+        log_command(command=command_str, detail=f"Could not view logs due to {e}", status="Failed", msg=msg)
 
 
 @log_app.command("clear", help="Clears all logs from the current session")
 def clear_logs(msg: str = typer.Option("", "--msg", help="Optional log message")):
+    msg = msg.strip()
+    command_str = "log clear" + (" --msg" if msg else "")
     try:
         log_count = num_log()
         confirm = typer.confirm(f"Are you sure you want to delete {log_count} log{'s' if log_count != 1 else ''}?")
 
         if not confirm:
             typer.secho("Aborted. Logs not cleared.", fg=typer.colors.YELLOW)
-            log_command(command="log clear", detail="User aborted log clear", status="Cancelled", msg=msg)
+            log_command(command = command_str , detail="User aborted log clear", status="Cancelled", msg=msg)
             return
 
         clear_history()
         typer.secho("Logs cleared.", fg=typer.colors.RED, bold=True)
-        log_command(command="log clear", detail="Cleared logs", status="Completed", msg=msg)
+        log_command(command= command_str, detail="Cleared logs", status="Completed", msg=msg)
 
     except Exception as e:
         typer.secho(f"Error: {e}", fg=typer.colors.RED)
-        log_command(command="log clear", detail=f"Unable to clear logs due to {e}", status="Failed", msg=msg)
+        log_command(command=command_str, detail=f"Unable to clear logs due to {e}", status="Failed", msg=msg)
