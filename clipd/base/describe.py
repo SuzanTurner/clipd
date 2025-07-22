@@ -5,8 +5,6 @@ from clipd.core.load import load
 from clipd.core.table import print_table
 from pathlib import Path
 import typer
-from rich.console import Console
-from rich.table import Table
 
 app = typer.Typer()
 
@@ -188,9 +186,10 @@ class Describe():
             file = load_session()
             path = Path(file)
             df = load(path)
+            cols = df.shape[1]
 
             typer.secho(f"Analyzing: {path.name}\n", fg=typer.colors.BLUE)
-            console = Console()
+            # console = Console()
 
             if all:
                 describe_df = df.describe(include="all").transpose()
@@ -200,6 +199,8 @@ class Describe():
             elif not any([dtypes, null, unique, head]):
                 describe_df = df.describe().transpose()
                 print_table(describe_df)
+                typer.secho(f"Rows : {df.shape[0]}",fg=typer.colors.BLUE)
+                typer.secho(f"Columns : {df.shape[1]}", fg=typer.colors.BLUE)
 
             rows_to_add = {}
 
@@ -213,18 +214,24 @@ class Describe():
                 rows_to_add["unique"] = [str(df[col].nunique()) for col in df.columns]
 
             if rows_to_add:
-                metric_df = pd.DataFrame(rows_to_add, index=df.columns).transpose()
-                print_table(metric_df)
+                df_rows = pd.DataFrame(rows_to_add, index=df.columns)
+                df_rows = df_rows.reset_index(names="Metric")
+                print_table(df_rows)
 
             if head:
                 typer.secho(f"\n🔹 Top {lines} Rows:", fg=typer.colors.CYAN)
-                # console.print(df.head(lines))
-                print_table(df.head(lines))
+                if cols > 17:
+                    print_table(df.head(lines).transpose())
+                else:
+                    print_table(df.head(lines))
+
 
             if tail:
                 typer.secho(f"\n🔹 Top {lines} Rows:", fg=typer.colors.CYAN)
-                # console.print(df.head(lines))
-                print_table(df.tail(lines))
+                if cols > 17:
+                    print_table(df.tail(lines).transpose())
+                else:
+                    print_table(df.tail(lines))
 
 
             log_command(
