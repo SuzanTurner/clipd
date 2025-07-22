@@ -1,6 +1,7 @@
 from clipd.core.session import active_file, filename
 from clipd.core.decorators import requires_connection
 from clipd.core.log_utils import log_command
+from rich import print
 import typer 
 
 # TODO : Also check if connected fie is clean
@@ -18,7 +19,7 @@ class Check():
         path = active_file()
         
         if filename(path):
-            print(f"Connected to {filename(path)}")
+            print(f"Connected to [bold green]{filename(path)}[/bold green]")
             log_command(
                 command = command_str,
                 detail = "Checking active file",

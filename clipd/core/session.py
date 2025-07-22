@@ -1,4 +1,3 @@
-
 from pathlib import Path
 import json
 
@@ -13,14 +12,14 @@ def save_session(file_path: str):
 
 def load_session() -> str:
     if not SESSION_PATH.exists():
-        raise FileNotFoundError("No session found. \nRun `clipd connect <file>` first.")
+        raise FileNotFoundError("No session found. \nRun `clipd connect <file>`")
     
     with open(SESSION_PATH) as f:
         return json.load(f)["file"]
 
 def active_file() -> Path:
     if not SESSION_PATH.exists():
-        raise FileNotFoundError("No active file. \nRun `clipd connect <file>` first.")
+        raise FileNotFoundError("No active file. \nRun `clipd connect <file>` ")
 
     with open(SESSION_PATH) as f:
         raw_path = json.load(f)["file"]
