@@ -24,7 +24,7 @@ Think Git meets Pandas.
 
 ---
 
-# Once installed, here’s how `clipd` commands feel in your terminal workflow:
+## Once installed, here’s how `clipd` commands feel in your terminal workflow:
 
 ```
 clipd init
@@ -57,7 +57,7 @@ Supprts `--json`, `--xlsx` formats for exporting as well, and also `--filename` 
 ---
 
 # Author
-> Made with love and --force by Yadhnika Wakde
+Made with love and --force by Yadhnika Wakde
 
-“Because sometimes, Jupyter is just too much.”
+
 
