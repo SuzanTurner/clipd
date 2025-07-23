@@ -15,9 +15,13 @@ A lightweight terminal-native CLI tool for exploring, cleaning, and transforming
 
 Here's what `clipd` can do *right now*:
 
+### Initialise Clipd
+- `clipd init`
+   Initialises `clipd` in the current directory.
+  
 ### File Management
 - `clipd connect <file.csv>`  
-  Connects a dataframe file for processing. All operations will apply to this active file.
+  Connects a dataframe file for processing. All operations will apply to this active file. (Make sure the file exists in the directory `clipd` is initialised in)
 
 - `clipd disconnect`  
   Safely disconnects the currently active file.
