@@ -4,6 +4,7 @@ from clipd.core.log_utils import log_command
 from clipd.core.load import load
 from clipd.core.table import print_table
 from typing import List
+from rich import print
 from pathlib import Path
 import typer
 
@@ -90,6 +91,8 @@ class Describe():
         percent : str = typer.Option(None, "--percent", help = "Comma-separated percentiles like: 0.1,0.2,0.3"),
         # exclude : str = typer.Option(None, "--exclude", help = "Excludes selected datatype [df.describe(exclude = 'object')]"),
         exclude: List[str] = typer.Option(None, "--exclude", help="Exclude data types", show_default=False),
+        zero: bool = typer.Option(False, "--zeros", help="Show memory usage for each column"),
+
         ) -> None:
 
         msg = msg.strip()
@@ -105,6 +108,7 @@ class Describe():
             + (f" --percent {percent}" if percent else "")
             
         )
+
 
         try:
             file = load_session()
@@ -152,9 +156,11 @@ class Describe():
 
             
             describe_df = df.describe(**describe_kwargs).transpose()
-            print_table(describe_df)
 
-            typer.secho(f"Rows : {df.shape[0]}", fg=typer.colors.BLUE)
+            print_table(describe_df)
+            
+
+            typer.secho(f"\nRows : {df.shape[0]}", fg=typer.colors.BLUE)
             typer.secho(f"Columns : {df.shape[1]}", fg=typer.colors.BLUE)
 
 
@@ -168,6 +174,8 @@ class Describe():
 
             if unique:
                 rows_to_add["unique"] = [str(df[col].nunique()) for col in df.columns]
+            if zero:
+                rows_to_add["zeros"] = [str((df[col] == 0).sum()) if pd.api.types.is_numeric_dtype(df[col]) else "-" for col in df.columns]
 
             if rows_to_add:
                 df_rows = pd.DataFrame(rows_to_add, index=df.columns)
