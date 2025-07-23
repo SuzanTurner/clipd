@@ -23,7 +23,8 @@ class Disconnect():
         file = disconnect_session()
         try:
             if file:
-                file_name = str(Path(file).name)[:-2]
+                # file_name = str(Path(file).name)[:-2]
+                file_name = str(Path(file).name)
                 typer.secho(f"Disconnected from {file_name} ", fg=typer.colors.RED)
                 log_command(command = command_str,
                             detail = f"Disconnected from {file_name}",

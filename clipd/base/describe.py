@@ -3,6 +3,7 @@ from clipd.core.session import load_session
 from clipd.core.log_utils import log_command
 from clipd.core.load import load
 from clipd.core.table import print_table
+from typing import List
 from pathlib import Path
 import typer
 
@@ -86,7 +87,10 @@ class Describe():
         head: bool = typer.Option(False, "--head", help="Show top n row [df.head()]"),
         tail:bool = typer.Option(False, "--tail", help = "Show bottom n rows [df.tail()]"),
         lines: int = 5,
-    ) -> None:
+        percent : str = typer.Option(None, "--percent", help = "Comma-separated percentiles like: 0.1,0.2,0.3"),
+        # exclude : str = typer.Option(None, "--exclude", help = "Excludes selected datatype [df.describe(exclude = 'object')]"),
+        exclude: List[str] = typer.Option(None, "--exclude", help="Exclude data types", show_default=False),
+        ) -> None:
 
         msg = msg.strip()
         command_msg = (
@@ -98,6 +102,8 @@ class Describe():
             + (" --dtypes" if dtypes else "")
             + (" --head" if head else "")
             + (f" --lines {lines}" if lines != 5 else "")
+            + (f" --percent {percent}" if percent else "")
+            
         )
 
         try:
@@ -109,16 +115,48 @@ class Describe():
             typer.secho(f"Analyzing: {path.name}\n", fg=typer.colors.BLUE)
             # console = Console()
 
-            if all:
-                describe_df = df.describe(include="all").transpose()
-                print_table(describe_df)
+            # if not percent:
+            #     if all:
+            #         describe_df = df.describe(include="all").transpose()
+            #         print_table(describe_df)
 
-            # Handle default describe when no other flags
-            elif not any([dtypes, null, unique, head]):
-                describe_df = df.describe().transpose()
-                print_table(describe_df)
-                typer.secho(f"Rows : {df.shape[0]}",fg=typer.colors.BLUE)
-                typer.secho(f"Columns : {df.shape[1]}", fg=typer.colors.BLUE)
+            #     # elif exclude and object:
+            #     #     describe_df = df.describe(exclude= f"{object}").transpose()
+            #     #     print_table(describe_df)
+
+            #     elif exclude:
+            #         describe_df = df.describe(exclude=exclude).transpose()
+            #         print_table(describe_df)
+
+            #     elif not any([dtypes, null, unique, head]):
+            #         describe_df = df.describe().transpose()
+            #         print_table(describe_df)
+            #         typer.secho(f"Rows : {df.shape[0]}",fg=typer.colors.BLUE)
+            #         typer.secho(f"Columns : {df.shape[1]}", fg=typer.colors.BLUE)
+            # else:
+            #     percent_list = [float(p.strip()) for p in percent.split(",")]
+            #     percent_list = [p if p < 1 else p / 100 for p in percent_list]
+            #     describe_df = df.describe(percentiles= percent_list).transpose()
+            #     print_table(describe_df)
+
+            describe_kwargs = {}
+
+            if all:
+                describe_kwargs["include"] = "all"
+            if exclude:
+                describe_kwargs["exclude"] = exclude
+            if percent:
+                percent_list = [float(p.strip()) for p in percent.split(",")]
+                percent_list = [p if p < 1 else p / 100 for p in percent_list]
+                describe_kwargs["percentiles"] = percent_list
+
+            
+            describe_df = df.describe(**describe_kwargs).transpose()
+            print_table(describe_df)
+
+            typer.secho(f"Rows : {df.shape[0]}", fg=typer.colors.BLUE)
+            typer.secho(f"Columns : {df.shape[1]}", fg=typer.colors.BLUE)
+
 
             rows_to_add = {}
 
