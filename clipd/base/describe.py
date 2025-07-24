@@ -81,9 +81,9 @@ class Describe():
     @staticmethod
     def describe(
         all: bool = typer.Option(False, "--all", help="Include non-numeric columns"),
-        null: bool = typer.Option(False, "--null", help="Show null value counts"),
-        unique: bool = typer.Option(False, "--unique", help="Show unique value counts"),
-        dtypes: bool = typer.Option(False, "--dtypes", help="Show column data types"),
+        null: bool = typer.Option(False, "--null", "-n", help="Show null value counts"),
+        unique: bool = typer.Option(False, "--unique", "-u", help="Show unique value counts"),
+        dtypes: bool = typer.Option(False, "--dtypes", "-d", help="Show column data types"),
         msg: str = typer.Option("", "--msg", help="Optional log message"),
         head: bool = typer.Option(False, "--head", help="Show top n row [df.head()]"),
         tail:bool = typer.Option(False, "--tail", help = "Show bottom n rows [df.tail()]"),
@@ -91,7 +91,8 @@ class Describe():
         percent : str = typer.Option(None, "--percent", help = "Comma-separated percentiles like: 0.1,0.2,0.3"),
         # exclude : str = typer.Option(None, "--exclude", help = "Excludes selected datatype [df.describe(exclude = 'object')]"),
         exclude: List[str] = typer.Option(None, "--exclude", help="Exclude data types", show_default=False),
-        zero: bool = typer.Option(False, "--zeros", help="Show memory usage for each column"),
+        zero: bool = typer.Option(False, "--zeros", "-z", help="Show number of zeros in columns"),
+        dupes: bool = typer.Option(False, "--dupes", help = "Shows duplicated values in col"),
 
         ) -> None:
 
@@ -106,6 +107,7 @@ class Describe():
             + (" --head" if head else "")
             + (f" --lines {lines}" if lines != 5 else "")
             + (f" --percent {percent}" if percent else "")
+            + (f" --dupes" if dupes else "")
             
         )
 
@@ -155,34 +157,37 @@ class Describe():
                 describe_kwargs["percentiles"] = percent_list
 
             
-            describe_df = df.describe(**describe_kwargs).transpose()
-
-            print_table(describe_df)
+            if not (dtypes or null or unique or dupes or zero):
+                describe_df = df.describe(**describe_kwargs).transpose()
+                print_table(describe_df)
+                typer.secho(f"\nRows : {df.shape[0]}", fg=typer.colors.BLUE)
+                typer.secho(f"Columns : {df.shape[1]}", fg=typer.colors.BLUE)
+                
             
+            else:
+                rows_to_add = {}
 
-            typer.secho(f"\nRows : {df.shape[0]}", fg=typer.colors.BLUE)
-            typer.secho(f"Columns : {df.shape[1]}", fg=typer.colors.BLUE)
+                if dtypes:
+                    rows_to_add["dtype"] = [str(df[col].dtype) for col in df.columns]
 
+                if null:
+                    rows_to_add["nulls"] = [str(df[col].isnull().sum()) for col in df.columns]
 
-            rows_to_add = {}
+                if unique:
+                    rows_to_add["unique"] = [str(df[col].nunique()) for col in df.columns]
 
-            if dtypes:
-                rows_to_add["dtype"] = [str(df[col].dtype) for col in df.columns]
+                if dupes:
+                    rows_to_add["duplicates"] = [str(df[col].duplicated().sum()) for col in df.columns]
 
-            if null:
-                rows_to_add["nulls"] = [str(df[col].isnull().sum()) for col in df.columns]
+                if zero:
+                    rows_to_add["zeros"] = [str((df[col] == 0).sum()) if pd.api.types.is_numeric_dtype(df[col]) else "-" for col in df.columns]
 
-            if unique:
-                rows_to_add["unique"] = [str(df[col].nunique()) for col in df.columns]
-            if zero:
-                rows_to_add["zeros"] = [str((df[col] == 0).sum()) if pd.api.types.is_numeric_dtype(df[col]) else "-" for col in df.columns]
-
-            if rows_to_add:
-                df_rows = pd.DataFrame(rows_to_add, index=df.columns)
-                if cols < 17:
-                    print_table(df_rows.transpose())
-                else:
-                    print_table(df_rows)
+                if rows_to_add:
+                    df_rows = pd.DataFrame(rows_to_add, index=df.columns)
+                    if cols < 17:
+                        print_table(df_rows.transpose())
+                    else:
+                        print_table(df_rows)
 
             if head:
                 typer.secho(f"\n🔹 Top {lines} Rows:", fg=typer.colors.CYAN)
