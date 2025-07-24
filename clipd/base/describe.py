@@ -4,6 +4,7 @@ from clipd.core.log_utils import log_command
 from clipd.core.load import load
 from clipd.core.table import print_table
 from typing import List
+from scipy.stats import entropy
 from rich import print
 from pathlib import Path
 import typer
@@ -93,7 +94,13 @@ class Describe():
         exclude: List[str] = typer.Option(None, "--exclude", help="Exclude data types", show_default=False),
         zero: bool = typer.Option(False, "--zeros", "-z", help="Show number of zeros in columns"),
         dupes: bool = typer.Option(False, "--dupes", help = "Shows duplicated values in col"),
-
+        emptystr: bool = typer.Option(False, "--empty", help = "Shows column with empty strings"),
+        topval: bool = typer.Option(False, "--top", help = "Shows most frequently used value in column"),
+        maxlen: bool = typer.Option(False, "--maxlen", help = "Shows maximum length of string in column"),
+        nans: bool = typer.Option(False, "--nans", help = "Shows sum of nans in column"),
+        const: bool = typer.Option(False, "--const"),
+        entropy_flag: bool = typer.Option(False, "--entropy", help = "Shows entropy of columns"),
+        
         ) -> None:
 
         msg = msg.strip()
@@ -157,7 +164,7 @@ class Describe():
                 describe_kwargs["percentiles"] = percent_list
 
             
-            if not (dtypes or null or unique or dupes or zero):
+            if not (dtypes or null or unique or dupes or zero or topval or entropy_flag or emptystr or nans or const or maxlen):
                 describe_df = df.describe(**describe_kwargs).transpose()
                 print_table(describe_df)
                 typer.secho(f"\nRows : {df.shape[0]}", fg=typer.colors.BLUE)
@@ -178,6 +185,34 @@ class Describe():
 
                 if dupes:
                     rows_to_add["duplicates"] = [str(df[col].duplicated().sum()) for col in df.columns]
+
+                if emptystr:
+                    rows_to_add["empty_str"] = [str((df[col] == "").sum()) if df[col].dtype == object else "-" for col in df.columns]
+
+                if nans:
+                    rows_to_add["NaNs"] = [str(df[col].isna().sum()) for col in df.columns]
+
+                if const:
+                    rows_to_add["is_constant"] = [str(df[col].nunique() == 1) for col in df.columns]
+
+                if entropy_flag:
+                    rows_to_add["entropy"] = [
+                        str(round(entropy(df[col].value_counts(normalize=True)), 4)) if df[col].dtype == object else "-"
+                        for col in df.columns
+                    ]
+
+                if topval:
+                    rows_to_add["top_value"] = [
+                        str(df[col].mode().iloc[0]) if not df[col].mode().empty else "-"
+                        for col in df.columns
+                    ]
+
+                if maxlen:
+                    rows_to_add["max_len"] = [
+                        str(df[col].astype(str).map(len).max()) if df[col].dtype == object else "-"
+                        for col in df.columns
+                    ]
+
 
                 if zero:
                     rows_to_add["zeros"] = [str((df[col] == 0).sum()) if pd.api.types.is_numeric_dtype(df[col]) else "-" for col in df.columns]
