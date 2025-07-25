@@ -76,7 +76,7 @@ clipd log clear
 ---
 
 # Author
-Made with love and --force by Yadhnika Wakde
+Made with love and `--force` by Yadhnika Wakde
 > I hope clipd grows into a useful tool and makes etl easier and faster. 
 
 
