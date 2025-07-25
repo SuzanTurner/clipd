@@ -1,15 +1,21 @@
-from clipd.core.session import active_file, filename
+from clipd.core.session import active_file, filename, load_session
 from clipd.core.decorators import requires_connection
+from clipd.core.load import load
 from clipd.core.log_utils import log_command
 from rich import print
+from scipy.stats import entropy
+from clipd.core.table import print_table
+from pathlib import Path
 import typer 
+import pandas as pd
 
 # TODO : Also check if connected fie is clean
 
 class Check():
     @requires_connection
     @staticmethod
-    def check(msg: str = typer.Option("", "--msg", help="Optional log message")) -> None:
+    def check(msg: str = typer.Option("", "--msg", help="Optional log message"),
+              ) -> None:
         """
         Checks current active file
         """
@@ -34,3 +40,4 @@ class Check():
                 msg = command_str
             )
 
+       
